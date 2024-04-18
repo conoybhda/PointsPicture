@@ -1,0 +1,44 @@
+{
+  "name": "@conoybhda/pointspicture",
+  "version": "0.0.2",
+  "description": "",
+  "types": "./lib/cjs/types/index.d.ts",
+  "main": "./lib/cjs/index.js",
+  "scripts": {
+    "clean": "rd /s /q lib",
+    "clean:linux": "rm -rf lib",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs",
+    "build:linux": "npm run clean:linux && npm run build:esm:linux && npm run build:cjs",
+    "build:esm": "tsc -p ./configs/tsconfig.esm.json && cd lib/esm/ && ren index.js index.mjs",
+    "build:esm:linux": "tsc -p ./configs/tsconfig.esm.json && mv lib/esm/index.js lib/esm/index.mjs",
+    "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
+    "prepack": "npm run build",
+    "prepack:linux": "npm run build:linux",
+    "test": "npm run build && copy lib test/lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conoybhda/PointsPicture.git"
+  },
+  "author": "conoybhda <2022302181208@whu.edu.cn>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/conoybhda/PointsPicture/issues"
+  },
+  "homepage": "https://github.com/conoybhda/PointsPicture#readme",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/esm/types/index.d.ts",
+        "default": "./lib/esm/index.mjs"
+      },
+      "require": {
+        "types": "./lib/cjs/types/index.d.ts",
+        "default": "./lib/cjs/index.js"
+      }
+    }
+  },
+  "files": [
+    "lib/**/*"
+  ]
+}

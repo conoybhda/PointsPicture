@@ -1,0 +1,4 @@
+npm 
+
+worker使用的是绝对路径
+我暂时不知道如何再npm包中获得正确的worker路径，因此用new Blob替代
