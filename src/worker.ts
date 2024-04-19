@@ -16,6 +16,8 @@ export default () => {
   let x: number = 0;
   let y: number = 0;
   let isCaculate = false;
+  let mouse = { isMove: false, x: 0, y: 0 };
+  let r: number = 100;
   onmessage = async (e) => {
     switch (e.data.method) {
       case "init":
@@ -29,10 +31,15 @@ export default () => {
         changePoints(e.data.points);
         break;
       case "moveMouse":
-        for (let i of points) {
-          i.x = i.cx + e.data.x;
-          i.y = i.cy + e.data.y;
-        }
+        mouse.isMove = true;
+        mouse.x = e.data.x;
+        mouse.y = e.data.y;
+        break;
+      case "endMoveMouse":
+        mouse.isMove = false;
+        break;
+      case "changeR":
+        r = e.data.r;
         break;
       default:
         break;
@@ -70,7 +77,19 @@ export default () => {
   const pointsMove = () => {
     isCaculate = true;
     return new Promise<void>((resolve) => {
+      let d: number;
+      const r2 = Math.pow(r, 2);
+      const f = Math.pow(r, 3) / 10;
       for (let i of points) {
+        if (mouse.isMove) {
+          if (
+            (d = Math.pow(i.x - mouse.x, 2) + Math.pow(i.y - mouse.y, 2)) < r2
+          ) {
+            const r = Math.atan2(i.y - mouse.y, i.x - mouse.x);
+            i.x = i.x + (f / d) * Math.cos(r);
+            i.y = i.y + (f / d) * Math.sin(r);
+          }
+        }
         i.x = i.x + (i.cx - i.x) / 10;
         i.y = i.y + (i.cy - i.y) / 10;
       }

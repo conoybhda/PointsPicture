@@ -55,6 +55,13 @@ class MyCanvas {
   moveMouse(x: number, y: number) {
     this.worker.postMessage({ method: "moveMouse", x, y });
   }
+  endMoveMouse() {
+    this.worker.postMessage({ method: "endMoveMouse" });
+  }
+  // 修改半径
+  changeR(r: number) {
+    this.worker.postMessage({ method: "changeR", r });
+  }
   end() {
     this.worker.terminate();
   }
