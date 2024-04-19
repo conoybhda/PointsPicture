@@ -23,8 +23,10 @@ const changePoints = () => {
   for (let i = 0; i < 800; i += 3) {
     for (let j = 0; j < 300; j += 3) {
       arr.push({
-        x: i,
-        y: j,
+        x: Math.random() * 800,
+        y: Math.random() * 300,
+        // x: i,
+        // y: j,
         rgba: [0, 0, 0, 255],
       });
     }
@@ -33,8 +35,8 @@ const changePoints = () => {
 };
 
 const change = () => {
-  console.log(Number(force.value) * 1000);
-  c.changeR(Number(force.value) * 1000000);
+  console.log(Number(force.value) * 100);
+  c.changeR(Number(force.value) * 100);
 };
 
 const move = (e: MouseEvent) => {

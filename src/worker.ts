@@ -17,7 +17,7 @@ export default () => {
   let y: number = 0;
   let isCaculate = false;
   let mouse = { isMove: false, x: 0, y: 0 };
-  let weight: number = 100000000;
+  let weight: number = 2500;
   onmessage = async (e) => {
     switch (e.data.method) {
       case "init":
@@ -81,15 +81,14 @@ export default () => {
       if (mouse.isMove) {
         for (let i of points) {
           let q = Math.atan2(i.cy - mouse.y, i.cx - mouse.x);
-          let r = Math.hypot(i.cx - mouse.x, i.cy - mouse.y);
-          r = r < weight / 50 ? weight / 50 : r;
-          i.x = i.x + (i.cx + (weight / r) * Math.cos(q) - i.x) / 15;
-          i.y = i.y + (i.cy + (weight / r) * Math.sin(q) - i.y) / 15;
+          let r = Math.hypot(i.cx - mouse.x, i.cy - mouse.y) + weight / 50;
+          i.x = i.x + (i.cx + (weight / r) * Math.cos(q) - i.x) / 10;
+          i.y = i.y + (i.cy + (weight / r) * Math.sin(q) - i.y) / 10;
         }
       } else {
         for (let i of points) {
-          i.x = i.x + (i.cx - i.x) / 15;
-          i.y = i.y + (i.cy - i.y) / 15;
+          i.x = i.x + (i.cx - i.x) / 10;
+          i.y = i.y + (i.cy - i.y) / 10;
         }
       }
 
