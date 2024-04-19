@@ -33,8 +33,8 @@ const changePoints = () => {
 };
 
 const change = () => {
-  console.log(force.value);
-  c.changeR(force.value);
+  console.log(Number(force.value) * 1000);
+  c.changeR(Number(force.value) * 1000000);
 };
 
 const move = (e: MouseEvent) => {

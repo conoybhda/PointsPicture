@@ -17,7 +17,7 @@ export default () => {
   let y: number = 0;
   let isCaculate = false;
   let mouse = { isMove: false, x: 0, y: 0 };
-  let r: number = 100;
+  let weight: number = 100000000;
   onmessage = async (e) => {
     switch (e.data.method) {
       case "init":
@@ -38,8 +38,8 @@ export default () => {
       case "endMoveMouse":
         mouse.isMove = false;
         break;
-      case "changeR":
-        r = e.data.r;
+      case "changeWeight":
+        weight = e.data.weight;
         break;
       default:
         break;
@@ -76,26 +76,25 @@ export default () => {
   // 异步计算点位的改变
   const pointsMove = () => {
     isCaculate = true;
-    return new Promise<void>((resolve) => {
+    setTimeout(() => {
       let d: number;
-      const r2 = Math.pow(r, 2);
-      const f = Math.pow(r, 3) / 10;
-      for (let i of points) {
-        if (mouse.isMove) {
-          if (
-            (d = Math.pow(i.x - mouse.x, 2) + Math.pow(i.y - mouse.y, 2)) < r2
-          ) {
-            const r = Math.atan2(i.y - mouse.y, i.x - mouse.x);
-            i.x = i.x + (f / d) * Math.cos(r);
-            i.y = i.y + (f / d) * Math.sin(r);
-          }
+      if (mouse.isMove) {
+        for (let i of points) {
+          let q = Math.atan2(i.cy - mouse.y, i.cx - mouse.x);
+          let r = Math.hypot(i.cx - mouse.x, i.cy - mouse.y);
+          r = r < weight / 50 ? weight / 50 : r;
+          i.x = i.x + (i.cx + (weight / r) * Math.cos(q) - i.x) / 15;
+          i.y = i.y + (i.cy + (weight / r) * Math.sin(q) - i.y) / 15;
         }
-        i.x = i.x + (i.cx - i.x) / 10;
-        i.y = i.y + (i.cy - i.y) / 10;
+      } else {
+        for (let i of points) {
+          i.x = i.x + (i.cx - i.x) / 15;
+          i.y = i.y + (i.cy - i.y) / 15;
+        }
       }
+
       isCaculate = false;
-      resolve();
-    });
+    }, 0);
   };
   const draw = () => {
     let a: ImageData, b: Uint8ClampedArray;

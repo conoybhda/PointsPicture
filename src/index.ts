@@ -60,7 +60,7 @@ class MyCanvas {
   }
   // 修改半径
   changeR(r: number) {
-    this.worker.postMessage({ method: "changeR", r });
+    this.worker.postMessage({ method: "changeWeight", weight: r});
   }
   end() {
     this.worker.terminate();
