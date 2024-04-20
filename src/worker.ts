@@ -10,14 +10,6 @@ interface Point {
 }
 
 export default () => {
-  let canvas: HTMLCanvasElement;
-  let ctx: CanvasRenderingContext2D | null = null;
-  let points: Point[] = [];
-  let x: number = 0;
-  let y: number = 0;
-  let isCaculate = false;
-  let mouse = { isMove: false, x: 0, y: 0 };
-  let weight: number = 2500;
   onmessage = async (e) => {
     switch (e.data.method) {
       case "init":
@@ -40,6 +32,10 @@ export default () => {
         break;
       case "changeWeight":
         weight = e.data.weight;
+        break;
+      case "changeMethod":
+        moveMethod =
+          caculatePoints[e.data.moveMethod as keyof typeof caculatePoints];
         break;
       default:
         break;
@@ -73,18 +69,39 @@ export default () => {
       points[i].rgba = newPoints[i].rgba;
     }
   };
+  // 由鼠标位置计算点位的改变函数
+  const caculatePoints = {
+    // 排斥效果
+    push: () => {
+      for (let i of points) {
+        let q = Math.atan2(i.cy - mouse.y, i.cx - mouse.x);
+        let r = Math.hypot(i.cx - mouse.x, i.cy - mouse.y) + weight / 50;
+        i.x = i.x + (i.cx + (weight / r) * Math.cos(q) - i.x) / 10;
+        i.y = i.y + (i.cy + (weight / r) * Math.sin(q) - i.y) / 10;
+      }
+    },
+    // 吸附效果
+    pull: () => {
+      for (let i of points) {
+        let q = Math.atan2(i.cy - mouse.y, i.cx - mouse.x);
+        let r = Math.hypot(i.cx - mouse.x, i.cy - mouse.y);
+        if (r < 100) {
+          i.x = i.x + (mouse.x - i.x) / 10;
+          i.y = i.y + (mouse.y - i.y) / 10;
+        } else {
+          i.x = i.x + (i.cx - (weight / r) * Math.cos(q) - i.x) / 10;
+          i.y = i.y + (i.cy - (weight / r) * Math.sin(q) - i.y) / 10;
+        }
+      }
+    },
+  };
   // 异步计算点位的改变
   const pointsMove = () => {
     isCaculate = true;
     setTimeout(() => {
       let d: number;
       if (mouse.isMove) {
-        for (let i of points) {
-          let q = Math.atan2(i.cy - mouse.y, i.cx - mouse.x);
-          let r = Math.hypot(i.cx - mouse.x, i.cy - mouse.y) + weight / 50;
-          i.x = i.x + (i.cx + (weight / r) * Math.cos(q) - i.x) / 10;
-          i.y = i.y + (i.cy + (weight / r) * Math.sin(q) - i.y) / 10;
-        }
+        moveMethod();
       } else {
         for (let i of points) {
           i.x = i.x + (i.cx - i.x) / 10;
@@ -117,4 +134,13 @@ export default () => {
     }
     requestAnimationFrame(draw);
   };
+  let canvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D | null = null;
+  let points: Point[] = [];
+  let x: number = 0;
+  let y: number = 0;
+  let isCaculate = false;
+  let mouse = { isMove: false, x: 0, y: 0 };
+  let moveMethod: Function = caculatePoints.push;
+  let weight: number = 2500;
 };

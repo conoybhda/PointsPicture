@@ -18,6 +18,7 @@ class MyCanvas {
   public worker: Worker;
   public x: number = 0;
   public y: number = 0;
+  public moveMethod: "push" | "pull" = "push";
 
   constructor(
     canvasWorker: Worker,
@@ -59,8 +60,13 @@ class MyCanvas {
     this.worker.postMessage({ method: "endMoveMouse" });
   }
   // 修改半径
-  changeR(r: number) {
-    this.worker.postMessage({ method: "changeWeight", weight: r});
+  changeWeight(r: number) {
+    this.worker.postMessage({ method: "changeWeight", weight: r });
+  }
+  // 修改方法
+  changeMethod(moveMethod: "push" | "pull") {
+    this.moveMethod = moveMethod;
+    this.worker.postMessage({ method: "changeMethod", moveMethod });
   }
   end() {
     this.worker.terminate();

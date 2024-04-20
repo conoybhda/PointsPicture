@@ -8,6 +8,7 @@
     @mouseleave="leave"
   ></canvas>
   <button @click="changePoints">changePoints</button>
+  <button @click="changeMethod">changeMethod</button>
   <input type="range" v-model="force" @change="change" />
 </template>
 <script setup lang="ts">
@@ -34,9 +35,13 @@ const changePoints = () => {
   c.changePoints(arr);
 };
 
+const changeMethod = () => {
+  c.moveMethod == "push" ? c.changeMethod("pull") : c.changeMethod("push");
+};
+
 const change = () => {
   console.log(Number(force.value) * 100);
-  c.changeR(Number(force.value) * 100);
+  c.changeWeight(Number(force.value) * 100);
 };
 
 const move = (e: MouseEvent) => {
