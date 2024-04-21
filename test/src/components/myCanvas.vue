@@ -9,6 +9,7 @@
   ></canvas>
   <button @click="changePoints">changePoints</button>
   <button @click="changeMethod">changeMethod</button>
+  <button @click="load">load</button>
   <input type="range" v-model="force" @change="change" />
 </template>
 <script setup lang="ts">
@@ -18,6 +19,10 @@ import { initCanvas } from "@conoybhda/pointspicture";
 const canvas = ref<HTMLCanvasElement | null>(null);
 const force = ref(0);
 let c: any = null;
+
+const load = async () => {
+  c.loadImg("fanhuicang.png");
+};
 
 const changePoints = () => {
   let arr = [];

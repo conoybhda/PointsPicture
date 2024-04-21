@@ -39,6 +39,9 @@ class MyCanvas {
       },
       [offscrean]
     );
+    this.worker.onmessage = (e) => {
+      console.log(e);
+    };
   }
   // 修改图片
   changeImage(image: ImageData) {}
@@ -67,6 +70,13 @@ class MyCanvas {
   changeMethod(moveMethod: "push" | "pull") {
     this.moveMethod = moveMethod;
     this.worker.postMessage({ method: "changeMethod", moveMethod });
+  }
+  // 加载图片
+  loadImg(url: string) {
+    this.worker.postMessage({
+      method: "loadImg",
+      url: new URL(url, location.href).toString(),
+    });
   }
   end() {
     this.worker.terminate();

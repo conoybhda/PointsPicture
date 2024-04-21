@@ -37,12 +37,80 @@ export default () => {
         moveMethod =
           caculatePoints[e.data.moveMethod as keyof typeof caculatePoints];
         break;
+      case "loadImg":
+        loadImg(e.data.url);
+        break;
       default:
         break;
     }
   };
+  // 加载图片
+  const loadImg = async (url: string | URL) => {
+    try {
+      const res = await fetch(url);
+      if (
+        !res ||
+        res.status !== 200 ||
+        !res.headers?.get("Content-type")?.match(/image/)
+      ) {
+        console.error("图片加载失败");
+        return res;
+      }
+      const blob = await res.blob();
+      const bitmap = await createImageBitmap(blob);
+      const offscrean = new OffscreenCanvas(800, 300);
+      const ctx = offscrean.getContext("2d");
+      if (!ctx) {
+        console.error("获取offscrean失败");
+        return;
+      }
+      (ctx as OffscreenCanvasRenderingContext2D).drawImage(bitmap, 0, 0);
+      const imageData = (ctx as OffscreenCanvasRenderingContext2D).getImageData(
+        0,
+        0,
+        800,
+        300
+      );
+      bitmap.close();
+      // 计算点阵
+      let points: {
+        x: number;
+        y: number;
+        rgba: [number, number, number, number];
+      }[] = [];
+      let index = 0;
+      for (let i = 0; i < imageData.width; i += 3) {
+        for (let j = 0; j < imageData.height; j += 3) {
+          index = (i * imageData.width + j) * 4;
+          if (imageData.data[index + 3] > 0) {
+            points.push({
+              x: i,
+              y: j,
+              rgba: [
+                imageData.data[index],
+                imageData.data[index + 1],
+                imageData.data[index + 2],
+                imageData.data[index + 3],
+              ],
+            });
+          }
+        }
+      }
+      console.log(points);
+      changePoints(points);
+      return imageData;
+    } catch (e) {
+      console.log(e);
+    }
+  };
   // 改变点阵
-  const changePoints = (newPoints: Point[]) => {
+  const changePoints = (
+    newPoints: {
+      x: number;
+      y: number;
+      rgba: [number, number, number, number];
+    }[]
+  ) => {
     // 首先打乱原来的点阵，避免有规律的运动打破粒子动画的随机性
     // 点数适配
     if (points.length >= newPoints.length) {
@@ -89,8 +157,8 @@ export default () => {
           i.x = i.x + (mouse.x - i.x) / 10;
           i.y = i.y + (mouse.y - i.y) / 10;
         } else {
-          i.x = i.x + (i.cx - (weight / r) * Math.cos(q) - i.x) / 10;
-          i.y = i.y + (i.cy - (weight / r) * Math.sin(q) - i.y) / 10;
+          i.x = i.x + (i.cx - ((weight * 3) / r) * Math.cos(q) - i.x) / 10;
+          i.y = i.y + (i.cy - ((weight * 3) / r) * Math.sin(q) - i.y) / 10;
         }
       }
     },
