@@ -21,7 +21,7 @@ const force = ref(0);
 let c: any = null;
 
 const load = async () => {
-  c.loadImg("fanhuicang.png");
+  c.loadImg("fanhuicang.png", 800, 200);
 };
 
 const changePoints = () => {

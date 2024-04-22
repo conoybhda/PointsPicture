@@ -72,10 +72,12 @@ class MyCanvas {
     this.worker.postMessage({ method: "changeMethod", moveMethod });
   }
   // 加载图片
-  loadImg(url: string) {
+  loadImg(url: string, width?: number, height?: number) {
     this.worker.postMessage({
       method: "loadImg",
       url: new URL(url, location.href).toString(),
+      width,
+      height,
     });
   }
   end() {

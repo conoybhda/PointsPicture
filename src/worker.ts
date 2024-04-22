@@ -38,14 +38,18 @@ export default () => {
           caculatePoints[e.data.moveMethod as keyof typeof caculatePoints];
         break;
       case "loadImg":
-        loadImg(e.data.url);
+        loadImg(e.data.url, e.data.width, e.data.height);
         break;
       default:
         break;
     }
   };
   // 加载图片
-  const loadImg = async (url: string | URL) => {
+  const loadImg = async (
+    url: string | URL,
+    width?: number,
+    height?: number
+  ) => {
     try {
       const res = await fetch(url);
       if (
@@ -57,8 +61,19 @@ export default () => {
         return res;
       }
       const blob = await res.blob();
-      const bitmap = await createImageBitmap(blob);
-      const offscrean = new OffscreenCanvas(800, 300);
+      let bitmap = await createImageBitmap(blob);
+      // 适配图片大小
+      width = width || bitmap.width;
+      height = height || bitmap.height;
+      if (bitmap.width > width || bitmap.height > height) {
+        let scale = Math.min(width / bitmap.width, height / bitmap.height);
+        bitmap = await createImageBitmap(blob, {
+          resizeWidth: bitmap.width * scale,
+          resizeHeight: bitmap.height * scale,
+        });
+      }
+
+      const offscrean = new OffscreenCanvas(width, height);
       const ctx = offscrean.getContext("2d");
       if (!ctx) {
         console.error("获取offscrean失败");
@@ -68,10 +83,11 @@ export default () => {
       const imageData = (ctx as OffscreenCanvasRenderingContext2D).getImageData(
         0,
         0,
-        800,
-        300
+        width,
+        height
       );
       bitmap.close();
+      console.log(imageData);
       // 计算点阵
       let points: {
         x: number;
@@ -79,9 +95,10 @@ export default () => {
         rgba: [number, number, number, number];
       }[] = [];
       let index = 0;
+      console.log(imageData);
       for (let i = 0; i < imageData.width; i += 3) {
         for (let j = 0; j < imageData.height; j += 3) {
-          index = (i * imageData.width + j) * 4;
+          index = (j * imageData.width + i) * 4;
           if (imageData.data[index + 3] > 0) {
             points.push({
               x: i,
